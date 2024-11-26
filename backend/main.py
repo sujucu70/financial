@@ -2,17 +2,10 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+import os
 import pandas as pd
 import numpy as np
-from typing import Dict, List
-from datetime import datetime
-import json
-import logging
-import os
-
-# Configurar logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+from typing import Dict
 
 app = FastAPI()
 
@@ -24,13 +17,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# Montar archivos estáticos del frontend
+
+# Importante: Primero definimos las rutas de la API
+@app.post("/api/analyze")
+async def analyze_file(file: UploadFile = File(...)):
+    try:
+        # Tu código existente para analizar el archivo
+        contents = await file.read()
+        df = pd.read_csv(pd.io.common.BytesIO(contents))
+        # ... resto del código de análisis ...
+        return response_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Después de las rutas de la API, montamos los archivos estáticos
 if os.path.exists("../frontend/dist"):
     app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
 
 @app.get("/")
 async def read_root():
-    return FileResponse("../frontend/dist/index.html")
+    if os.path.exists("../frontend/dist/index.html"):
+        return FileResponse("../frontend/dist/index.html")
+    return {"message": "API running"}
 
 def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
     """
