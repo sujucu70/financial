@@ -3,14 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
+from openai import OpenAI
+from typing import Dict
+
 import os
 import pandas as pd
 import numpy as np
-from typing import Dict
 import logging
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
