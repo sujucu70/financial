@@ -2,11 +2,15 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from dotenv import load_dotenv
 import os
 import pandas as pd
 import numpy as np
 from typing import Dict
 import logging
+
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
