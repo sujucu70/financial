@@ -10,6 +10,8 @@ import os
 import pandas as pd
 import numpy as np
 import logging
+import json
+
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
