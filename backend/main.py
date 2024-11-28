@@ -84,41 +84,61 @@ def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
         raise
 
 def generate_mock_analysis(df: pd.DataFrame) -> Dict:
-    """Genera un análisis simulado basado en los datos"""
     try:
-        logger.debug("Generando análisis simulado")
+        logger.debug("Generando análisis con IA")
         
-        # Análisis por categoría
-        category_totals = df.groupby('categoria')['importe'].sum()
-        category_means = df.groupby('categoria')['importe'].mean()
-        category_counts = df.groupby('categoria')['importe'].count()
+        # Preparar datos para el prompt
+        category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
+        tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
-        # Encontrar categoría con mayor gasto
-        top_category = category_totals.idxmax()
-        top_category_total = category_totals[top_category]
-        top_category_mean = category_means[top_category]
+        prompt = f"""
+        Analiza estos datos financieros de una PYME:
         
-        # Análisis por tipo de gasto
-        tipo_gasto_totals = df.groupby('tipo_gasto')['importe'].sum()
+        Gastos por categoría:
+        {category_stats.to_string()}
         
-        return {
-            "patterns": [
-                f"La categoría {top_category} representa el mayor gasto con {top_category_total:,.2f}€",
-                f"El gasto promedio en {top_category} es de {top_category_mean:,.2f}€",
-                f"Se han identificado {len(df['tipo_gasto'].unique())} tipos diferentes de gastos"
+        Gastos por tipo:
+        {tipo_gasto_stats.to_string()}
+        
+        Genera un análisis con este formato JSON:
+        {{
+            "patterns": ["3 patrones principales detectados"],
+            "anomalies": ["2 anomalías o puntos de atención"],
+            "recommendations": ["2 recomendaciones específicas y accionables"]
+        }}
+        
+        Responde SOLO con el JSON, sin texto adicional.
+        """
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Eres un analista financiero experto que proporciona análisis concisos y prácticos."},
+                {"role": "user", "content": prompt}
             ],
-            "anomalies": [
-                f"La categoría {category_totals.idxmin()} muestra el menor gasto total",
-                f"Se identificaron {len(category_counts)} categorías diferentes de gastos"
-            ],
-            "recommendations": [
-                f"Revisar los gastos en la categoría {top_category} para posibles optimizaciones",
-                f"Analizar la distribución de gastos entre los {len(tipo_gasto_totals)} tipos de gasto"
-            ]
-        }
+            temperature=0.7
+        )
+
+        return json.loads(response.choices[0].message.content)
+        
     except Exception as e:
         logger.error(f"Error en generate_mock_analysis: {str(e)}")
-        raise
+        # Fallback a análisis estático si hay error
+        return {
+            "patterns": [
+                "Error al generar análisis con IA",
+                "Usando análisis básico",
+                "Revise los datos de entrada"
+            ],
+            "anomalies": [
+                "No se pudo analizar anomalías",
+                "Sistema funcionando en modo fallback"
+            ],
+            "recommendations": [
+                "Verificar formato de datos",
+                "Intentar nuevamente más tarde"
+            ]
+        }
 
 @app.post("/api/analyze")
 async def analyze_file(file: UploadFile = File(...)):
