@@ -91,6 +91,8 @@ def generate_mock_analysis(df: pd.DataFrame) -> Dict:
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
+        logger.debug("API Key presente: " + str(bool(os.getenv("OPENAI_API_KEY"))))
+        
         prompt = f"""
         Analiza estos datos financieros de una PYME:
         
@@ -100,42 +102,48 @@ def generate_mock_analysis(df: pd.DataFrame) -> Dict:
         Gastos por tipo:
         {tipo_gasto_stats.to_string()}
         
-        Genera un análisis con este formato JSON:
-        {{
-            "patterns": ["3 patrones principales detectados"],
-            "anomalies": ["2 anomalías o puntos de atención"],
-            "recommendations": ["2 recomendaciones específicas y accionables"]
-        }}
-        
-        Responde SOLO con el JSON, sin texto adicional.
-        """
+        Proporciona en español:
+        1. Tres patrones principales detectados
+        2. Dos anomalías o puntos de atención
+        3. Dos recomendaciones específicas
 
+        Responde en formato JSON:
+        {{
+            "patterns": ["patrón 1", "patrón 2", "patrón 3"],
+            "anomalies": ["anomalía 1", "anomalía 2"],
+            "recommendations": ["recomendación 1", "recomendación 2"]
+        }}
+        """
+        
+        logger.debug("Enviando prompt a OpenAI")
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Eres un analista financiero experto que proporciona análisis concisos y prácticos."},
+                {"role": "system", "content": "Eres un analista financiero experto que proporciona análisis concisos y prácticos en español."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7
         )
-
+        logger.debug("Respuesta recibida de OpenAI: " + str(response.choices[0].message.content))
+        
         return json.loads(response.choices[0].message.content)
         
     except Exception as e:
-        logger.error(f"Error en generate_mock_analysis: {str(e)}")
-        # Fallback a análisis estático si hay error
+        logger.error(f"Error detallado en generate_mock_analysis: {str(e)}")
+        logger.exception("Traceback completo:")
+        # Fallback mejorado
         return {
             "patterns": [
-                "Error al generar análisis con IA",
+                f"Error al generar análisis con IA: {str(e)}",
                 "Usando análisis básico",
-                "Revise los datos de entrada"
+                "Revise los datos de entrada y la configuración de OpenAI"
             ],
             "anomalies": [
                 "No se pudo analizar anomalías",
                 "Sistema funcionando en modo fallback"
             ],
             "recommendations": [
-                "Verificar formato de datos",
+                "Verificar la configuración de OpenAI API",
                 "Intentar nuevamente más tarde"
             ]
         }
