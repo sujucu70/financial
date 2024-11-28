@@ -95,27 +95,21 @@ def generate_mock_analysis(df: pd.DataFrame) -> Dict:
         
         logger.debug("API Key presente: " + str(bool(os.getenv("OPENAI_API_KEY"))))
         
-        prompt = f"""
-        Analiza estos datos financieros de una PYME:
-        
-        Gastos por categoría:
-        {category_stats.to_string()}
-        
-        Gastos por tipo:
-        {tipo_gasto_stats.to_string()}
-        
-        Proporciona en español:
-        1. Tres patrones principales detectados
-        2. Dos anomalías o puntos de atención
-        3. Dos recomendaciones específicas
+        prompt = """
+Analiza estos datos financieros y responde SOLO con un JSON en este formato exacto, sin texto adicional:
+{
+    "patterns": ["patrón 1", "patrón 2", "patrón 3"],
+    "anomalies": ["anomalía 1", "anomalía 2"],
+    "recommendations": ["recomendación 1", "recomendación 2"]
+}
 
-        Responde en formato JSON:
-        {{
-            "patterns": ["patrón 1", "patrón 2", "patrón 3"],
-            "anomalies": ["anomalía 1", "anomalía 2"],
-            "recommendations": ["recomendación 1", "recomendación 2"]
-        }}
-        """
+Datos financieros:
+Gastos por categoría:
+{category_stats.to_string()}
+
+Gastos por tipo:
+{tipo_gasto_stats.to_string()}
+"""
         
         logger.debug("Enviando prompt a OpenAI")
         response = client.chat.completions.create(
