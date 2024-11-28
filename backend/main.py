@@ -87,61 +87,52 @@ def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
 
 def generate_mock_analysis(df: pd.DataFrame) -> Dict:
     try:
-        logger.debug("Generando análisis con IA")
-        
-        # Preparar datos para el prompt
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
-        logger.debug("API Key presente: " + str(bool(os.getenv("OPENAI_API_KEY"))))
-        
-        prompt = """
-Analiza estos datos financieros y responde SOLO con un JSON en este formato exacto, sin texto adicional:
-{
-    "patterns": ["patrón 1", "patrón 2", "patrón 3"],
-    "anomalies": ["anomalía 1", "anomalía 2"],
-    "recommendations": ["recomendación 1", "recomendación 2"]
-}
+        prompt = f"""Genera un análisis financiero en formato JSON:
+{{
+    "patterns": [
+        "describe patrón 1",
+        "describe patrón 2",
+        "describe patrón 3"
+    ],
+    "anomalies": [
+        "describe anomalía 1",
+        "describe anomalía 2"
+    ],
+    "recommendations": [
+        "describe recomendación 1",
+        "describe recomendación 2"
+    ]
+}}
 
-Datos financieros:
-Gastos por categoría:
+Datos:
 {category_stats.to_string()}
-
-Gastos por tipo:
 {tipo_gasto_stats.to_string()}
-"""
-        
-        logger.debug("Enviando prompt a OpenAI")
+
+IMPORTANTE: Responde SOLO con el JSON válido."""
+
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Eres un analista financiero experto que proporciona análisis concisos y prácticos en español."},
+                {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7
+            temperature=0.5
         )
-        logger.debug("Respuesta recibida de OpenAI: " + str(response.choices[0].message.content))
+
+        raw_response = response.choices[0].message.content.strip()
+        logger.debug(f"Respuesta de OpenAI: {raw_response}")
         
-        return json.loads(response.choices[0].message.content)
-        
+        return json.loads(raw_response)
+
     except Exception as e:
-        logger.error(f"Error detallado en generate_mock_analysis: {str(e)}")
-        logger.exception("Traceback completo:")
-        # Fallback mejorado
+        logger.error(f"Error en análisis: {str(e)}")
         return {
-            "patterns": [
-                f"Error al generar análisis con IA: {str(e)}",
-                "Usando análisis básico",
-                "Revise los datos de entrada y la configuración de OpenAI"
-            ],
-            "anomalies": [
-                "No se pudo analizar anomalías",
-                "Sistema funcionando en modo fallback"
-            ],
-            "recommendations": [
-                "Verificar la configuración de OpenAI API",
-                "Intentar nuevamente más tarde"
-            ]
+            "patterns": ["Error en análisis", "Revise los datos", "Intente nuevamente"],
+            "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
+            "recommendations": ["Verificar datos", "Reintentar más tarde"]
         }
 
 @app.post("/api/analyze")
