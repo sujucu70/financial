@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from 'recharts';
 import { Upload, AlertTriangle, Brain } from 'lucide-react';
 import axios from 'axios';
-import 'tailwindcss/tailwind.css'; // Add this line to include Tailwind CSS
+import 'tailwindcss/tailwind.css';
 
 // Define CustomTooltip outside the main component
 const CustomTooltip = ({ active, payload, label }) => {
@@ -67,37 +67,39 @@ function App() {
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-2xl font-bold mb-6 text-center">Análisis Financiero PYME</h1>
 
-      {/* File Upload */}
-      <div className="mb-6 p-6 border-2 border-dashed rounded-lg flex justify-center items-center">
-        <label className="flex flex-col items-center cursor-pointer">
-          <Upload className="w-12 h-12 text-gray-400" />
-          <span className="mt-2 text-sm">Subir archivo CSV</span>
-          <input
-            type="file"
-            className="hidden"
-            accept=".csv"
-            onChange={handleFileUpload}
-            disabled={loading}
-          />
-        </label>
-      </div>
-
-      {/* Loading State */}
-      {loading && (
-        <div className="text-center py-4">
-          <p>Procesando archivo...</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* File Upload */}
+        <div className="mb-6 p-6 border-2 border-dashed rounded-lg flex justify-center items-center">
+          <label className="flex flex-col items-center cursor-pointer">
+            <Upload className="w-12 h-12 text-gray-400" />
+            <span className="mt-2 text-sm">Subir archivo CSV</span>
+            <input
+              type="file"
+              className="hidden"
+              accept=".csv"
+              onChange={handleFileUpload}
+              disabled={loading}
+            />
+          </label>
         </div>
-      )}
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 p-4 rounded-lg mb-6">
-          <div className="flex items-center">
-            <AlertTriangle className="w-5 h-5 text-red-400 mr-2" />
-            <p className="text-red-800">{error}</p>
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-4">
+            <p>Procesando archivo...</p>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 p-4 rounded-lg mb-6">
+            <div className="flex items-center">
+              <AlertTriangle className="w-5 h-5 text-red-400 mr-2" />
+              <p className="text-red-800">{error}</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Stats Section */}
       {data?.stats && (
