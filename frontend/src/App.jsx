@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine } from 'recharts';
 import { Upload, AlertTriangle, Brain } from 'lucide-react';
 import axios from 'axios';
+import 'tailwindcss/tailwind.css'; // Add this line to include Tailwind CSS
 
-// Definir CustomTooltip fuera del componente principal
+// Define CustomTooltip outside the main component
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     const dataPoint = payload[0].payload;
@@ -64,10 +65,10 @@ function App() {
 
   return (
     <div className="p-4 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Análisis Financiero PYME</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Análisis Financiero PYME</h1>
 
       {/* File Upload */}
-      <div className="mb-6 p-6 border-2 border-dashed rounded-lg">
+      <div className="mb-6 p-6 border-2 border-dashed rounded-lg flex justify-center items-center">
         <label className="flex flex-col items-center cursor-pointer">
           <Upload className="w-12 h-12 text-gray-400" />
           <span className="mt-2 text-sm">Subir archivo CSV</span>
