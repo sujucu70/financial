@@ -59,27 +59,6 @@ function App() {
     }
   };
 
-  return (
-    <div className="App">
-      <h1>Registro de Usuario</h1>
-      <form onSubmit={handleSubmit}>
-        <label>Alias:</label>
-        <input type="text" value={alias} onChange={(e) => setAlias(e.target.value)} required />
-
-        <label>Contraseña:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-
-        <label>Sector:</label>
-        <input type="text" value={sector} onChange={(e) => setSector(e.target.value)} required />
-
-        <label>Comunidad Autónoma:</label>
-        <input type="text" value={comunidadAutonoma} onChange={(e) => setComunidadAutonoma(e.target.value)} required />
-
-        <button type="submit">Registrar</button>
-      </form>
-    </div>
-  );
-};
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -282,6 +261,23 @@ function App() {
           </div>
         </div>
       )}
+
+      <h1>Registro de Usuario</h1>
+      <form onSubmit={handleSubmit}>
+        <label>Alias:</label>
+        <input type="text" value={alias} onChange={(e) => setAlias(e.target.value)} required />
+
+        <label>Contraseña:</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+        <label>Sector:</label>
+        <input type="text" value={sector} onChange={(e) => setSector(e.target.value)} required />
+
+        <label>Comunidad Autónoma:</label>
+        <input type="text" value={comunidadAutonoma} onChange={(e) => setComunidadAutonoma(e.target.value)} required />
+
+        <button type="submit">Registrar</button>
+      </form>
     </div>
   );
 }
