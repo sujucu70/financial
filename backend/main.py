@@ -5,6 +5,8 @@ from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from openai import OpenAI
 from typing import Dict
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 import os
 import pandas as pd
@@ -12,6 +14,28 @@ import numpy as np
 import logging
 import json
 
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    alias = data.get('alias')
+    password = data.get('password')
+    sector = data.get('sector')
+    comunidad_autonoma = data.get('comunidadAutonoma')
+
+    # Here you would typically store the data in a database
+    # For now, we'll just print it
+    print(f"Alias: {alias}")
+    print(f"Password: {password}")
+    print(f"Sector: {sector}")
+    print(f"Comunidad Autónoma: {comunidad_autonoma}")
+
+    return jsonify({"message": "Registration successful!"}), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
