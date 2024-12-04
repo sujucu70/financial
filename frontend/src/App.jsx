@@ -37,7 +37,49 @@ function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [alias, setAlias] = useState('');
+  const [password, setPassword] = useState('');
+  const [sector, setSector] = useState('');
+  const [comunidadAutonoma, setComunidadAutonoma] = useState('');
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ alias, password, sector, comunidadAutonoma }),
+    });
+
+    if (response.ok) {
+      alert('Registration successful!');
+    } else {
+      alert('Registration failed');
+    }
+  };
+
+  return (
+    <div className="App">
+      <h1>Registro de Usuario</h1>
+      <form onSubmit={handleSubmit}>
+        <label>Alias:</label>
+        <input type="text" value={alias} onChange={(e) => setAlias(e.target.value)} required />
+
+        <label>Contraseña:</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+        <label>Sector:</label>
+        <input type="text" value={sector} onChange={(e) => setSector(e.target.value)} required />
+
+        <label>Comunidad Autónoma:</label>
+        <input type="text" value={comunidadAutonoma} onChange={(e) => setComunidadAutonoma(e.target.value)} required />
+
+        <button type="submit">Registrar</button>
+      </form>
+    </div>
+  );
+};
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
