@@ -104,23 +104,73 @@ function App() {
           </label>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-4">
-            <p>Procesando archivo...</p>
-          </div>
-        )}
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 p-4 rounded-lg mb-6">
-            <div className="flex items-center">
-              <AlertTriangle className="w-5 h-5 text-red-400 mr-2" />
-              <p className="text-red-800">{error}</p>
+        {/* Registration Form */}
+        <div className="mb-6 p-6 border-2 border-dashed rounded-lg">
+          <h1 className="text-xl font-bold mb-4">Registro de Usuario</h1>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Alias:</label>
+              <input
+                type="text"
+                value={alias}
+                onChange={(e) => setAlias(e.target.value)}
+                required
+                className="mt-1 block w-full p-2 border rounded"
+              />
             </div>
-          </div>
-        )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Contraseña:</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="mt-1 block w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Sector:</label>
+              <input
+                type="text"
+                value={sector}
+                onChange={(e) => setSector(e.target.value)}
+                required
+                className="mt-1 block w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Comunidad Autónoma:</label>
+              <input
+                type="text"
+                value={comunidadAutonoma}
+                onChange={(e) => setComunidadAutonoma(e.target.value)}
+                required
+                className="mt-1 block w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded">Registrar</button>
+            </div>
+          </form>
+        </div>
       </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-4">
+          <p>Procesando archivo...</p>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 p-4 rounded-lg mb-6">
+          <div className="flex items-center">
+            <AlertTriangle className="w-5 h-5 text-red-400 mr-2" />
+            <p className="text-red-800">{error}</p>
+          </div>
+        </div>
+      )}
 
       {/* Stats Section */}
       {data?.stats && (
@@ -261,23 +311,6 @@ function App() {
           </div>
         </div>
       )}
-
-      <h1>Registro de Usuario</h1>
-      <form onSubmit={handleSubmit}>
-        <label>Alias:</label>
-        <input type="text" value={alias} onChange={(e) => setAlias(e.target.value)} required />
-
-        <label>Contraseña:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-
-        <label>Sector:</label>
-        <input type="text" value={sector} onChange={(e) => setSector(e.target.value)} required />
-
-        <label>Comunidad Autónoma:</label>
-        <input type="text" value={comunidadAutonoma} onChange={(e) => setComunidadAutonoma(e.target.value)} required />
-
-        <button type="submit">Registrar</button>
-      </form>
     </div>
   );
 }
