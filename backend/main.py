@@ -190,11 +190,10 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
     }}
 }}"""
        
-    
-Datos:
+        datos = f"""
 {category_stats.to_string()}
 {tipo_gasto_stats.to_string()}
-
+"""
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -217,7 +216,6 @@ Datos:
             "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
             "recommendations": ["Verificar datos", "Reintentar más tarde"]
         }
-
 # Montar archivos estáticos después de las rutas API
 if os.path.exists("../frontend/dist"):
     app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
