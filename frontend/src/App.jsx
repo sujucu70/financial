@@ -62,20 +62,20 @@ function App() {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
+  
     setLoading(true);
     setError(null);
-
+  
     const formData = new FormData();
     formData.append('file', file);
-
+  
     try {
-      const response = await axios.post('/api/analyze', formData, {
+      const response = await axios.post(`http://localhost:8000/api/analyze?sector=${sector}&comunidad_autonoma=${comunidadAutonoma}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       setData(response.data);
     } catch (error) {
       setError(error.response?.data?.detail || 'Error al procesar el archivo');
