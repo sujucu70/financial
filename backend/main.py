@@ -177,9 +177,10 @@ Considerando los siguientes datos:
 * **Evaluación de la dificultad:** Se introduce una escala para evaluar la dificultad de implementación de cada recomendación, lo que permite a la empresa priorizar las acciones más factibles.
 * **Formato estructurado:** Se especifica un formato JSON detallado para facilitar la extracción y el análisis de la información."""
     
-Datos:
+        Datos = f"""
 {category_stats.to_string()}
 {tipo_gasto_stats.to_string()}
+"""
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
