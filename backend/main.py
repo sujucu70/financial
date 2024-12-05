@@ -163,7 +163,7 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
             }}
         ],
         "benchmarking": {{
-            "industry_averages": {},
+            "industry_averages": {{}},
             "performance_gaps": [],
             "opportunities": []
        }}
@@ -216,6 +216,7 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
             "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
             "recommendations": ["Verificar datos", "Reintentar más tarde"]
         }
+
 # Montar archivos estáticos después de las rutas API
 if os.path.exists("../frontend/dist"):
     app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
