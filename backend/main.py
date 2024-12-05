@@ -11,8 +11,8 @@ import logging
 import json
 import openai
 
-# load_dotenv()
-# openai.api_key = os.getenv("OPENAI_API_KEY")
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
