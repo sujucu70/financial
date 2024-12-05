@@ -199,8 +199,6 @@ Datos:
 {category_stats.to_string()}
 {tipo_gasto_stats.to_string()}
 
-IMPORTANTE: Responde SOLO con el JSON válido."""
-
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
