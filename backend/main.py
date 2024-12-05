@@ -140,47 +140,61 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
         # Prepare prompt for OpenAI
-        prompt = f"""Analiza los datos financieros de una PYME del sector {sector} ubicada en {comunidad_autonoma}. 
-Considerando los siguientes datos:
-* **Historial de gastos:** [Adjuntar datos históricos de gastos en formato CSV]
-* **Predicciones:** [Adjuntar datos de predicciones de gastos futuros]
-* **Análisis actual:** [Adjuntar el PDF con el análisis actual]
-
-**Genera un informe detallado que incluya:**
-
-* **Análisis de causalidad:** Identificar las causas raíz de las principales variaciones en los gastos y las tendencias observadas.
-* **Recomendaciones personalizadas:** Proponer acciones concretas y cuantificables para optimizar los gastos en cada categoría, incluyendo:
-    * **Estimación del ahorro potencial:** Cuantificar en términos monetarios el ahorro esperado al implementar cada recomendación.
-    * **Dificultad de implementación:** Calificar la dificultad de implementar cada recomendación en una escala de 1 a 5 (siendo 1 muy fácil y 5 muy difícil).
-    * **Ejemplos concretos:** Proporcionar ejemplos específicos de acciones que la empresa puede tomar, teniendo en cuenta su sector y ubicación geográfica.
-    * **Consideraciones contextuales:** Incorporar factores como las tendencias del mercado, las regulaciones locales y las mejores prácticas del sector.
-* **Simulaciones:** Realizar simulaciones de diferentes escenarios para evaluar el impacto financiero de las recomendaciones propuestas.
-* **Dashboard interactivo:** Generar un dashboard visual que permita al usuario explorar los datos y las recomendaciones de forma interactiva.
-
-**Formato del informe:** JSON, con secciones claras para cada tipo de análisis y recomendación.
-
-**Ejemplo de recomendación:**
-> **Recomendación:** Negociar mejores condiciones con los proveedores de materia prima X.
-> **Impacto estimado:** Ahorro del 10% en los costos de materia prima, equivalente a [cantidad] euros anuales.
-> **Dificultad:** 3 (moderada)
-> **Ejemplo:** Contactar a al menos 3 proveedores alternativos y solicitar cotizaciones detalladas. Aprovechar las plataformas de negociación online para obtener mejores precios.
-
-**Consideraciones adicionales:**
-* **Priorización de recomendaciones:** Clasificar las recomendaciones por orden de prioridad en función de su relación costo-beneficio y alineación con los objetivos estratégicos de la empresa.
-* **Sensibilidad a cambios:** Evaluar la sensibilidad de las recomendaciones a cambios en las condiciones del mercado o en los supuestos iniciales.
-* **Consideraciones cualitativas:** Incorporar factores cualitativos en la evaluación de las recomendaciones, como el impacto en la imagen de marca o la satisfacción del cliente.
-
-## Explicación de las mejoras:
-
-* **Mayor especificidad:** Se solicita al modelo que proporcione ejemplos concretos y cuantifique el impacto de cada recomendación.
-* **Consideración del contexto:** Se pide al modelo que tenga en cuenta el sector y la ubicación geográfica de la empresa para ofrecer recomendaciones más relevantes.
-* **Evaluación de la dificultad:** Se introduce una escala para evaluar la dificultad de implementación de cada recomendación, lo que permite a la empresa priorizar las acciones más factibles.
-* **Formato estructurado:** Se especifica un formato JSON detallado para facilitar la extracción y el análisis de la información."""
+        prompt = f"""Analiza los datos financieros y genera un informe detallado JSON para una PYME del sector '{sector}' en '{comunidad_autonoma}':
+ "industry_context": {{
+        "market_trends": [],
+        "regional_factors": [],
+        "seasonal_patterns": []
+    }},
+    "financial_analysis": {{
+        "spending_patterns": [
+            {{
+                "pattern": "descripción",
+                "impact": "impacto en negocio",
+                "severity": "alto/medio/bajo"
+            }}
+        ],
+        "anomalies": [
+            {{
+                "description": "descripción",
+                "potential_cause": "causa probable",
+                "risk_level": "alto/medio/bajo",
+                "immediate_actions": []
+            }}
+        ],
+        "benchmarking": {{
+            "industry_averages": {},
+            "performance_gaps": [],
+            "opportunities": []
+       }}
+    }},
+     "recommendations": [
+        {{
+            "action": "descripción",
+            "expected_impact": "impacto esperado",
+            "implementation_difficulty": "alta/media/baja",
+            "estimated_timeframe": "corto/medio/largo plazo",
+            "required_resources": [],
+            "roi_potential": "alto/medio/bajo"
+        }}
+    ],
+    "risk_assessment": {{
+        "identified_risks": [],
+        "mitigation_strategies": [],
+        "monitoring_metrics": []
+    }},
+    "optimization_opportunities": {{
+        "cost_reduction": [],
+        "revenue_enhancement": [],
+        "process_improvement": []
+    }}
+}}"""
+       
     
-        Datos = f"""
+Datos:
 {category_stats.to_string()}
 {tipo_gasto_stats.to_string()}
-"""
+
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
