@@ -142,73 +142,17 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         # Prepare prompt for OpenAI
 
 try:
-    prompt = f"""Analiza los datos financieros y genera un informe JSON para PYME del sector '{sector}' en '{comunidad_autonoma}', incluyendo contexto de mercado:
-{{
-    "market_context": {{
-        "sector_trends": [
-            {{
-                "trend": "",
-                "impact": "",
-                "source": ""
-            }}
-        ],
-        "regional_factors": [
-            {{
-                "factor": "",
-                "relevance": "",
-                "source": ""
-            }}
-        ]
-    }},
-    "financial_analysis": {{
-        "spending_patterns": [
-            {{
-                "pattern": "",
-                "impact": "",
-                "severity": ""
-            }}
-        ],
-        "anomalies": [
-            {{
-                "description": "",
-                "cause": "",
-                "risk_level": "",
-                "actions": []
-            }}
-        ]
-    }},
-    "recommendations": [
-        {{
-            "action": "",
-            "impact": "",
-            "market_context": "",
-            "difficulty": "",
-            "timeframe": "",
-            "roi": ""
-        }},
-        {{
-            "action": "",
-            "impact": "",
-            "market_context": "",
-            "difficulty": "",
-            "timeframe": "",
-            "roi": ""
-        }},
-        {{
-            "action": "",
-            "impact": "",
-            "market_context": "",
-            "difficulty": "",
-            "timeframe": "",
-            "roi": ""
-        }}
-    ],
-    "optimization": {{
-        "cost_reduction": [],
-        "revenue_enhancement": [],
-        "process_improvement": []
-    }}
-}}"""
+    prompt = f"""* **Recomendaciones personalizadas:** Proponer acciones concretas para optimizar los gastos en cada categoría, cuantificando el potencial de ahorro y el tiempo de implementación.
+* **Simulaciones:** Realizar simulaciones de diferentes escenarios para evaluar el impacto financiero de las recomendaciones propuestas.
+* **Dashboard interactivo:** Generar un dashboard visual que permita al usuario explorar los datos y las recomendaciones de forma interactiva.
+
+**El informe debe incluir:**
+
+* **Visualizaciones:** Gráficos y tablas que faciliten la comprensión de los datos.
+* **Lenguaje claro y conciso:** Explicar los conceptos técnicos de forma sencilla.
+* **Priorización de recomendaciones:** Clasificar las recomendaciones por orden de prioridad en función de su impacto potencial y facilidad de implementación.
+
+**Formato del informe:** JSON, con secciones claras para cada tipo de análisis y recomendación."""
     # Rest of your code
 except Exception as e:
     print(f"Error: {str(e)}")
