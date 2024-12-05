@@ -3,16 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from dotenv import load_dotenv
-from openai import OpenAI
 from typing import Dict
 import os
 import pandas as pd
 import numpy as np
 import logging
 import json
+import openai
 
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG)
@@ -29,6 +29,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+    
+def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
+    # Placeholder implementation
+    monthly_expenses = df.groupby('mes')['importe'].sum()
+    last_month_expense = monthly_expenses.iloc[-1]
+    predicted_amount = last_month_expense * 1.05  # Example prediction logic
+    confidence_level = 0.95  # Example confidence level
+    lower_bound = predicted_amount * 0.9
+    upper_bound = predicted_amount * 1.1
+
+    return {
+        "predicted_amount": predicted_amount,
+        "confidence_level": confidence_level,
+        "lower_bound": lower_bound,
+        "upper_bound": upper_bound
+    }    
+
 @app.post("/api/register")
 async def register(data: dict):
     alias = data.get('alias')
@@ -44,7 +62,7 @@ async def register(data: dict):
     return {"message": "Registration successful!"}, 200
 
 @app.post("/api/analyze")
-async def analyze_file(file: UploadFile = File(...)):
+async def analyze_file(file: UploadFile = File(...), sector: str = '', comunidad_autonoma: str = ''):
     try:
         logger.info(f"Iniciando análisis de archivo: {file.filename}")
         contents = await file.read()
@@ -64,7 +82,9 @@ async def analyze_file(file: UploadFile = File(...)):
         logger.debug(f"Datos procesados: {len(df)} filas válidas")
         df['mes'] = df['fecha'].dt.strftime('%Y-%m')
         monthly_expenses = df.groupby('mes')['importe'].sum().to_dict()
-        ai_analysis = generate_mock_analysis(df)
+        
+        ai_analysis = generate_mock_analysis(df, sector, comunidad_autonoma)
+        
         prediction_data = calculate_prediction_with_confidence(df)
         chart_data = [{"month": k, "gastos": float(v)} for k, v in monthly_expenses.items()]
         if chart_data:
@@ -76,6 +96,7 @@ async def analyze_file(file: UploadFile = File(...)):
                 "lowerBound": prediction_data['lower_bound'],
                 "upperBound": prediction_data['upper_bound']
             })
+        
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean']).round(2)
         top_category = category_stats['sum'].idxmax()
         stats_analysis = {
@@ -92,6 +113,7 @@ async def analyze_file(file: UploadFile = File(...)):
                 "promedio": float(category_stats.loc[top_category, 'mean'])
             }
         }
+        
         response_data = {
             "chartData": chart_data,
             "aiAnalysis": ai_analysis,
@@ -110,6 +132,58 @@ async def analyze_file(file: UploadFile = File(...)):
         logger.error(f"Error durante el análisis: {str(e)}")
         logger.exception("Traceback completo:")
         raise HTTPException(status_code=500, detail=str(e))
+
+def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: str) -> Dict:
+    try:
+        # Aggregate data for analysis
+        category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
+        tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
+        
+        # Prepare prompt for OpenAI
+        prompt = f"""Genera un análisis financiero en formato JSON considerando el sector '{sector}' y la comunidad autónoma '{comunidad_autonoma}':
+{{
+    "patterns": [
+        "describe patrón 1",
+        "describe patrón 2",
+        "describe patrón 3"
+    ],
+    "anomalies": [
+        "describe anomalía 1",
+        "describe anomalía 2"
+    ],
+    "recommendations": [
+        "describe recomendación 1",
+        "describe recomendación 2"
+    ]
+}}
+
+Datos:
+{category_stats.to_string()}
+{tipo_gasto_stats.to_string()}
+
+IMPORTANTE: Responde SOLO con el JSON válido."""
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5
+        )
+
+        raw_response = response.choices[0].message['content'].strip()
+        logger.debug(f"Respuesta de OpenAI: {raw_response}")
+        
+        return json.loads(raw_response)
+
+    except Exception as e:
+        logger.error(f"Error en análisis: {str(e)}")
+        return {
+            "patterns": ["Error en análisis", "Revise los datos", "Intente nuevamente"],
+            "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
+            "recommendations": ["Verificar datos", "Reintentar más tarde"]
+        }
 
 # Montar archivos estáticos después de las rutas API
 if os.path.exists("../frontend/dist"):
