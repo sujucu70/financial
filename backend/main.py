@@ -5,37 +5,11 @@ from fastapi.responses import FileResponse
 from dotenv import load_dotenv
 from openai import OpenAI
 from typing import Dict
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-
 import os
 import pandas as pd
 import numpy as np
 import logging
 import json
-
-app = Flask(__name__)
-CORS(app)
-
-@app.route('/api/register', methods=['POST'])
-def register():
-    data = request.get_json()
-    alias = data.get('alias')
-    password = data.get('password')
-    sector = data.get('sector')
-    comunidad_autonoma = data.get('comunidadAutonoma')
-
-    # Here you would typically store the data in a database
-    # For now, we'll just print it
-    print(f"Alias: {alias}")
-    print(f"Password: {password}")
-    print(f"Sector: {sector}")
-    print(f"Comunidad Autónoma: {comunidad_autonoma}")
-
-    return jsonify({"message": "Registration successful!"}), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -55,124 +29,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
-    """Calcula la predicción y nivel de confianza para el próximo mes"""
-    try:
-        logger.debug("Iniciando cálculo de predicción")
-        
-        # Asegurar que la fecha está en el formato correcto
-        df['fecha'] = pd.to_datetime(df['fecha'])
-        df['mes'] = df['fecha'].dt.strftime('%Y-%m')
-        
-        # Calcular gastos mensuales
-        monthly_expenses = df.groupby('mes')['importe'].sum()
-        logger.debug(f"Gastos mensuales calculados: {monthly_expenses.to_dict()}")
-        
-        # Calcular variación mes a mes
-        monthly_changes = monthly_expenses.pct_change().fillna(0)
-        
-        # Calcular predicción base
-        if len(monthly_expenses) >= 3:
-            base_prediction = monthly_expenses[-3:].mean()
-            std_dev = monthly_expenses[-3:].std()
-        else:
-            base_prediction = monthly_expenses.mean()
-            std_dev = monthly_expenses.std()
-        
-        # Evitar división por cero
-        if base_prediction == 0:
-            base_prediction = monthly_expenses.mean() if len(monthly_expenses) > 0 else 1000
-            
-        std_dev = std_dev if not pd.isna(std_dev) else 0
-        
-        # Calcular nivel de confianza
-        variation_coefficient = (std_dev / base_prediction) if base_prediction != 0 else 0
-        confidence_level = max(min(1 - variation_coefficient, 0.95), 0.50)
-        
-        # Calcular rango de predicción
-        margin_of_error = std_dev * 1.96
-        lower_bound = max(0, base_prediction - margin_of_error)
-        upper_bound = base_prediction + margin_of_error
-        
-        prediction_data = {
-            'predicted_amount': float(base_prediction),
-            'confidence_level': float(confidence_level),
-            'lower_bound': float(lower_bound),
-            'upper_bound': float(upper_bound),
-            'trend': 'increasing' if monthly_changes.mean() > 0 else 'decreasing'
-        }
-        
-        logger.debug(f"Predicción calculada: {prediction_data}")
-        return prediction_data
-        
-    except Exception as e:
-        logger.error(f"Error en calculate_prediction_with_confidence: {str(e)}")
-        raise
+@app.post("/api/register")
+async def register(data: dict):
+    alias = data.get('alias')
+    password = data.get('password')
+    sector = data.get('sector')
+    comunidad_autonoma = data.get('comunidadAutonoma')
 
-def generate_mock_analysis(df: pd.DataFrame) -> Dict:
-    try:
-        category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
-        tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
-        
-        prompt = f"""Genera un análisis financiero en formato JSON:
-{{
-    "patterns": [
-        "describe patrón 1",
-        "describe patrón 2",
-        "describe patrón 3"
-    ],
-    "anomalies": [
-        "describe anomalía 1",
-        "describe anomalía 2"
-    ],
-    "recommendations": [
-        "describe recomendación 1",
-        "describe recomendación 2"
-    ]
-}}
+    print(f"Alias: {alias}")
+    print(f"Password: {password}")
+    print(f"Sector: {sector}")
+    print(f"Comunidad Autónoma: {comunidad_autonoma}")
 
-Datos:
-{category_stats.to_string()}
-{tipo_gasto_stats.to_string()}
-
-IMPORTANTE: Responde SOLO con el JSON válido."""
-
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.5
-        )
-
-        raw_response = response.choices[0].message.content.strip()
-        logger.debug(f"Respuesta de OpenAI: {raw_response}")
-        
-        return json.loads(raw_response)
-
-    except Exception as e:
-        logger.error(f"Error en análisis: {str(e)}")
-        return {
-            "patterns": ["Error en análisis", "Revise los datos", "Intente nuevamente"],
-            "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
-            "recommendations": ["Verificar datos", "Reintentar más tarde"]
-        }
+    return {"message": "Registration successful!"}, 200
 
 @app.post("/api/analyze")
 async def analyze_file(file: UploadFile = File(...)):
     try:
         logger.info(f"Iniciando análisis de archivo: {file.filename}")
-        
-        # Leer el archivo CSV
         contents = await file.read()
         logger.debug("Archivo leído correctamente")
-        
-        # Convertir a DataFrame
         df = pd.read_csv(pd.io.common.BytesIO(contents))
         logger.debug(f"Columnas en el CSV: {df.columns.tolist()}")
-        
-        # Validar columnas requeridas
         required_columns = ['fecha', 'categoria', 'concepto', 'importe', 'tipo_gasto']
         if not all(col in df.columns for col in required_columns):
             missing_cols = [col for col in required_columns if col not in df.columns]
@@ -180,25 +58,15 @@ async def analyze_file(file: UploadFile = File(...)):
             logger.error(error_msg)
             raise HTTPException(status_code=400, detail=error_msg)
 
-        # Convertir fechas y asegurar que importe es numérico
         df['fecha'] = pd.to_datetime(df['fecha'])
         df['importe'] = pd.to_numeric(df['importe'], errors='coerce')
         df = df.dropna(subset=['importe'])
-        
         logger.debug(f"Datos procesados: {len(df)} filas válidas")
-
-        # Procesar datos por mes
         df['mes'] = df['fecha'].dt.strftime('%Y-%m')
         monthly_expenses = df.groupby('mes')['importe'].sum().to_dict()
-        
-        # Generar análisis
         ai_analysis = generate_mock_analysis(df)
         prediction_data = calculate_prediction_with_confidence(df)
-        
-        # Preparar datos para el gráfico
         chart_data = [{"month": k, "gastos": float(v)} for k, v in monthly_expenses.items()]
-        
-        # Añadir predicción
         if chart_data:
             next_month = pd.Timestamp(list(monthly_expenses.keys())[-1]) + pd.DateOffset(months=1)
             chart_data.append({
@@ -208,11 +76,8 @@ async def analyze_file(file: UploadFile = File(...)):
                 "lowerBound": prediction_data['lower_bound'],
                 "upperBound": prediction_data['upper_bound']
             })
-
-        # Estadísticas básicas
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean']).round(2)
         top_category = category_stats['sum'].idxmax()
-        
         stats_analysis = {
             "total_gasto": float(df['importe'].sum()),
             "promedio_mensual": float(df.groupby('mes')['importe'].sum().mean()),
@@ -227,7 +92,6 @@ async def analyze_file(file: UploadFile = File(...)):
                 "promedio": float(category_stats.loc[top_category, 'mean'])
             }
         }
-
         response_data = {
             "chartData": chart_data,
             "aiAnalysis": ai_analysis,
@@ -239,7 +103,6 @@ async def analyze_file(file: UploadFile = File(...)):
             ),
             "stats": stats_analysis
         }
-        
         logger.info("Análisis completado exitosamente")
         return response_data
 
