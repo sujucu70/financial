@@ -165,7 +165,7 @@ prompt = f"""Analiza los datos financieros y genera un informe detallado JSON pa
             }}
         ],
         "benchmarking": {{
-            "industry_averages": {},
+            "industry_averages": {{}},
             "performance_gaps": [],
             "opportunities": []
         }}
@@ -190,7 +190,8 @@ prompt = f"""Analiza los datos financieros y genera un informe detallado JSON pa
         "revenue_enhancement": [],
         "process_improvement": []
     }}
-}}"""        
+}}
+IMPORTANTE: Responde SOLO con el JSON válido."""
         
 
 
