@@ -141,57 +141,73 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         
         # Prepare prompt for OpenAI
 
-prompt = f"""Analiza los datos financieros y genera un informe detallado JSON para una PYME del sector '{sector}' en '{comunidad_autonoma}':
+prompt = f"""Analiza los datos financieros y genera un informe JSON para PYME del sector '{sector}' en '{comunidad_autonoma}', incluyendo contexto de mercado:
 {{
-    "industry_context": {{
-        "market_trends": [],
-        "regional_factors": [],
-        "seasonal_patterns": []
-    }},
-    "financial_analysis": {{
-        "spending_patterns": [
-            {{
-                "pattern": "descripción",
-                "impact": "impacto en negocio",
-                "severity": "alto/medio/bajo"
-            }}
-        ],
-        "anomalies": [
-            {{
-                "description": "descripción",
-                "potential_cause": "causa probable",
-                "risk_level": "alto/medio/bajo",
-                "immediate_actions": []
-            }}
-        ],
-        "benchmarking": {{
-            "industry_averages": {{}},
-            "performance_gaps": [],
-            "opportunities": []
-        }}
-    }},
-    "recommendations": [
-        {{
-            "action": "descripción",
-            "expected_impact": "impacto esperado",
-            "implementation_difficulty": "alta/media/baja",
-            "estimated_timeframe": "corto/medio/largo plazo",
-            "required_resources": [],
-            "roi_potential": "alto/medio/bajo"
-        }}
-    ],
-    "risk_assessment": {{
-        "identified_risks": [],
-        "mitigation_strategies": [],
-        "monitoring_metrics": []
-    }},
-    "optimization_opportunities": {{
-        "cost_reduction": [],
-        "revenue_enhancement": [],
-        "process_improvement": []
-    }}
-}}
-IMPORTANTE: Responde SOLO con el JSON válido."""
+   "market_context": {{
+       "sector_trends": [
+           {{
+               "trend": "",
+               "impact": "",
+               "source": ""
+           }}
+       ],
+       "regional_factors": [
+           {{
+               "factor": "",
+               "relevance": "",
+               "source": ""
+           }}
+       ]
+   }},
+   "financial_analysis": {{
+       "spending_patterns": [
+           {{
+               "pattern": "",
+               "impact": "",
+               "severity": ""
+           }}
+       ],
+       "anomalies": [
+           {{
+               "description": "",
+               "cause": "",
+               "risk_level": "",
+               "actions": []
+           }}
+       ]
+   }},
+   "recommendations": [
+       {{
+           "action": "",
+           "impact": "",
+           "market_context": "",
+           "difficulty": "",
+           "timeframe": "",
+           "roi": ""
+       }},
+       {{
+           "action": "",
+           "impact": "",
+           "market_context": "",
+           "difficulty": "",
+           "timeframe": "",
+           "roi": ""
+       }},
+       {{
+           "action": "",
+           "impact": "",
+           "market_context": "",
+           "difficulty": "",
+           "timeframe": "",
+           "roi": ""
+       }}
+   ],
+   "optimization": {{
+       "cost_reduction": [],
+       "revenue_enhancement": [],
+       "process_improvement": []
+   }}
+}}"""
         
 
 
