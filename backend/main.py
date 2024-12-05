@@ -140,7 +140,7 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
         # Prepare prompt for OpenAI
-        prompt = f"""Analiza los datos financieros de una PYME del sector [sector] ubicada en [comunidad_autonoma]. 
+        prompt = f"""Analiza los datos financieros de una PYME del sector {sector} ubicada en {comunidad_autonoma}. 
 Considerando los siguientes datos:
 * **Historial de gastos:** [Adjuntar datos históricos de gastos en formato CSV]
 * **Predicciones:** [Adjuntar datos de predicciones de gastos futuros]
