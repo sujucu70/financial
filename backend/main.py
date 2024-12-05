@@ -141,73 +141,77 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         
         # Prepare prompt for OpenAI
 
-prompt = f"""Analiza los datos financieros y genera un informe JSON para PYME del sector '{sector}' en '{comunidad_autonoma}', incluyendo contexto de mercado:
+try:
+    prompt = f"""Analiza los datos financieros y genera un informe JSON para PYME del sector '{sector}' en '{comunidad_autonoma}', incluyendo contexto de mercado:
 {{
-   "market_context": {{
-       "sector_trends": [
-           {{
-               "trend": "",
-               "impact": "",
-               "source": ""
-           }}
-       ],
-       "regional_factors": [
-           {{
-               "factor": "",
-               "relevance": "",
-               "source": ""
-           }}
-       ]
-   }},
-   "financial_analysis": {{
-       "spending_patterns": [
-           {{
-               "pattern": "",
-               "impact": "",
-               "severity": ""
-           }}
-       ],
-       "anomalies": [
-           {{
-               "description": "",
-               "cause": "",
-               "risk_level": "",
-               "actions": []
-           }}
-       ]
-   }},
-   "recommendations": [
-       {{
-           "action": "",
-           "impact": "",
-           "market_context": "",
-           "difficulty": "",
-           "timeframe": "",
-           "roi": ""
-       }},
-       {{
-           "action": "",
-           "impact": "",
-           "market_context": "",
-           "difficulty": "",
-           "timeframe": "",
-           "roi": ""
-       }},
-       {{
-           "action": "",
-           "impact": "",
-           "market_context": "",
-           "difficulty": "",
-           "timeframe": "",
-           "roi": ""
-       }}
-   ],
-   "optimization": {{
-       "cost_reduction": [],
-       "revenue_enhancement": [],
-       "process_improvement": []
-   }}
+    "market_context": {{
+        "sector_trends": [
+            {{
+                "trend": "",
+                "impact": "",
+                "source": ""
+            }}
+        ],
+        "regional_factors": [
+            {{
+                "factor": "",
+                "relevance": "",
+                "source": ""
+            }}
+        ]
+    }},
+    "financial_analysis": {{
+        "spending_patterns": [
+            {{
+                "pattern": "",
+                "impact": "",
+                "severity": ""
+            }}
+        ],
+        "anomalies": [
+            {{
+                "description": "",
+                "cause": "",
+                "risk_level": "",
+                "actions": []
+            }}
+        ]
+    }},
+    "recommendations": [
+        {{
+            "action": "",
+            "impact": "",
+            "market_context": "",
+            "difficulty": "",
+            "timeframe": "",
+            "roi": ""
+        }},
+        {{
+            "action": "",
+            "impact": "",
+            "market_context": "",
+            "difficulty": "",
+            "timeframe": "",
+            "roi": ""
+        }},
+        {{
+            "action": "",
+            "impact": "",
+            "market_context": "",
+            "difficulty": "",
+            "timeframe": "",
+            "roi": ""
+        }}
+    ],
+    "optimization": {{
+        "cost_reduction": [],
+        "revenue_enhancement": [],
+        "process_improvement": []
+    }}
 }}"""
+    # Rest of your code
+except Exception as e:
+    print(f"Error: {str(e)}")
         
 
 
