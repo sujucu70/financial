@@ -44,7 +44,7 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:8000/api/register', {
+    const response = await fetch('/api/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ function App() {
     formData.append('file', file);
   
     try {
-      const response = await axios.post(`http://localhost:8000/api/analyze?sector=${sector}&comunidad_autonoma=${comunidadAutonoma}`, formData, {
+      const response = await axios.post(`/api/analyze?sector=${sector}&comunidad_autonoma=${comunidadAutonoma}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
