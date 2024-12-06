@@ -29,8 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-    
 def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
     # Placeholder implementation
     monthly_expenses = df.groupby('mes')['importe'].sum()
@@ -45,7 +43,7 @@ def calculate_prediction_with_confidence(df: pd.DataFrame) -> Dict:
         "confidence_level": confidence_level,
         "lower_bound": lower_bound,
         "upper_bound": upper_bound
-    }    
+    }
 
 @app.post("/api/register")
 async def register(data: dict):
@@ -82,9 +80,9 @@ async def analyze_file(file: UploadFile = File(...), sector: str = '', comunidad
         logger.debug(f"Datos procesados: {len(df)} filas válidas")
         df['mes'] = df['fecha'].dt.strftime('%Y-%m')
         monthly_expenses = df.groupby('mes')['importe'].sum().to_dict()
-        
+
         ai_analysis = generate_mock_analysis(df, sector, comunidad_autonoma)
-        
+
         prediction_data = calculate_prediction_with_confidence(df)
         chart_data = [{"month": k, "gastos": float(v)} for k, v in monthly_expenses.items()]
         if chart_data:
@@ -96,7 +94,7 @@ async def analyze_file(file: UploadFile = File(...), sector: str = '', comunidad
                 "lowerBound": prediction_data['lower_bound'],
                 "upperBound": prediction_data['upper_bound']
             })
-        
+
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean']).round(2)
         top_category = category_stats['sum'].idxmax()
         stats_analysis = {
@@ -113,7 +111,7 @@ async def analyze_file(file: UploadFile = File(...), sector: str = '', comunidad
                 "promedio": float(category_stats.loc[top_category, 'mean'])
             }
         }
-        
+
         response_data = {
             "chartData": chart_data,
             "aiAnalysis": ai_analysis,
@@ -138,7 +136,7 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         # Aggregate data for analysis
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
-        
+
         # Prepare prompt for OpenAI
         prompt = f"""
         Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado:
@@ -159,11 +157,6 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
 
         Oportunidades de optimización:
         1. Oportunidades para reducir costos, aumentar ingresos, y mejorar procesos.
-        """
-
-        datos = f"""
-        {category_stats.to_string()}
-        {tipo_gasto_stats.to_string()}
         """
 
         response = openai.ChatCompletion.create(
@@ -187,7 +180,7 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
             "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
             "recommendations": ["Verificar datos", "Reintentar más tarde"]
         }
-        
+
 # Montar archivos estáticos después de las rutas API
 if os.path.exists("../frontend/dist"):
     app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
