@@ -139,61 +139,64 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
-        # Prepare prompt for OpenAI
-        prompt = f"""Analiza los datos financieros y genera un informe detallado JSON para una PYME del sector '{sector}' en '{comunidad_autonoma}':
- "industry_context": {{
-        "market_trends": [],
-        "regional_factors": [],
-        "seasonal_patterns": []
-    }},
-    "financial_analysis": {{
-        "spending_patterns": [
-            {{
-                "pattern": "descripción",
-                "impact": "impacto en negocio",
-                "severity": "alto/medio/bajo"
-            }}
-        ],
-        "anomalies": [
-            {{
-                "description": "descripción",
-                "potential_cause": "causa probable",
-                "risk_level": "alto/medio/bajo",
-                "immediate_actions": []
-            }}
-        ],
-        "benchmarking": {{
-            "industry_averages": {{}},
-            "performance_gaps": [],
-            "opportunities": []
-       }}
-    }},
-     "recommendations": [
+# Prepare prompt for OpenAI
+        prompt = f"""
+        Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado. Considera tendencias de mercado y factores regionales:
         {{
-            "action": "descripción",
-            "expected_impact": "impacto esperado",
-            "implementation_difficulty": "alta/media/baja",
-            "estimated_timeframe": "corto/medio/largo plazo",
-            "required_resources": [],
-            "roi_potential": "alto/medio/bajo"
+            "industry_context": {{
+                "market_trends": ["Describe las tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}"],
+                "regional_factors": ["Considera factores regionales específicos de {comunidad_autonoma} que puedan afectar los gastos"],
+                "seasonal_patterns": ["Identifica patrones estacionales que impacten los ingresos y gastos del negocio"]
+            }},
+            "financial_analysis": {{
+                "spending_patterns": [
+                    {{
+                        "pattern": "Describir patrón de gasto",
+                        "impact": "Impacto en el negocio",
+                        "severity": "alto/medio/bajo"
+                    }}
+                ],
+                "anomalies": [
+                    {{
+                        "description": "Describir anomalía",
+                        "potential_cause": "Causa probable",
+                        "risk_level": "alto/medio/bajo",
+                        "immediate_actions": ["Acciones inmediatas recomendadas"]
+                    }}
+                ],
+                "benchmarking": {{
+                    "industry_averages": "Comparar con promedios de la industria",
+                    "performance_gaps": ["Identificar brechas de rendimiento"],
+                    "opportunities": ["Oportunidades de mejora"]
+                }}
+            }},
+            "recommendations": [
+                {{
+                    "action": "Describir acción recomendada",
+                    "expected_impact": "Impacto esperado",
+                    "implementation_difficulty": "alta/media/baja",
+                    "estimated_timeframe": "corto/medio/largo plazo",
+                    "required_resources": ["Recursos necesarios"],
+                    "roi_potential": "alto/medio/bajo"
+                }}
+            ],
+            "risk_assessment": {{
+                "identified_risks": ["Identificar riesgos"],
+                "mitigation_strategies": ["Estrategias de mitigación"],
+                "monitoring_metrics": ["Métricas de monitoreo recomendadas"]
+            }},
+            "optimization_opportunities": {{
+                "cost_reduction": ["Oportunidades para reducir costos"],
+                "revenue_enhancement": ["Oportunidades para aumentar ingresos"],
+                "process_improvement": ["Mejoras en procesos"]
+            }}
         }}
-    ],
-    "risk_assessment": {{
-        "identified_risks": [],
-        "mitigation_strategies": [],
-        "monitoring_metrics": []
-    }},
-    "optimization_opportunities": {{
-        "cost_reduction": [],
-        "revenue_enhancement": [],
-        "process_improvement": []
-    }}
-}}"""
-       
+        """
+
         datos = f"""
-{category_stats.to_string()}
-{tipo_gasto_stats.to_string()}
-"""
+        {category_stats.to_string()}
+        {tipo_gasto_stats.to_string()}
+        """
 
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
@@ -206,7 +209,7 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
 
         raw_response = response.choices[0].message['content'].strip()
         logger.debug(f"Respuesta de OpenAI: {raw_response}")
-        
+
         return json.loads(raw_response)
 
     except Exception as e:
