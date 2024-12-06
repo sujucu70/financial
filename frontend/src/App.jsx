@@ -278,39 +278,39 @@ function App() {
 
       {/* AI Analysis Section */}
       {data?.aiAnalysis && (
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-            <Brain className="w-6 h-6" />
-            Análisis IA
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h3 className="font-medium mb-2">Patrones Detectados</h3>
-              <ul className="space-y-2">
-                {data.aiAnalysis.patterns.map((pattern, idx) => (
-                  <li key={idx} className="bg-blue-50 p-2 rounded">{pattern}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium mb-2">Anomalías</h3>
-              <ul className="space-y-2">
-                {data.aiAnalysis.anomalies.map((anomaly, idx) => (
-                  <li key={idx} className="bg-red-50 p-2 rounded">{anomaly}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium mb-2">Recomendaciones</h3>
-              <ul className="space-y-2">
-                {data.aiAnalysis.recommendations.map((rec, idx) => (
-                  <li key={idx} className="bg-green-50 p-2 rounded">{rec}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="bg-white p-6 rounded-lg shadow">
+    <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+      <Brain className="w-6 h-6" />
+      Análisis IA
+    </h2>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div>
+        <h3 className="font-medium mb-2">Patrones Detectados</h3>
+        <ul className="space-y-2">
+          {(data.aiAnalysis?.patterns ?? []).map((pattern, idx) => (
+            <li key={idx} className="bg-blue-50 p-2 rounded">{pattern}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h3 className="font-medium mb-2">Anomalías</h3>
+        <ul className="space-y-2">
+          {(data.aiAnalysis?.anomalies ?? []).map((anomaly, idx) => (
+            <li key={idx} className="bg-red-50 p-2 rounded">{anomaly}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h3 className="font-medium mb-2">Recomendaciones</h3>
+        <ul className="space-y-2">
+          {(data.aiAnalysis?.recommendations ?? []).map((rec, idx) => (
+            <li key={idx} className="bg-green-50 p-2 rounded">{rec}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
