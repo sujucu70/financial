@@ -139,36 +139,42 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         category_stats = df.groupby('categoria')['importe'].agg(['sum', 'mean', 'count']).round(2)
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
-# Prepare prompt for OpenAI
-prompt = f"""
-Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado:
-1. Tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}.
-2. Factores regionales específicos de {comunidad_autonoma} que puedan afectar los gastos.
-3. Patrones estacionales que impacten los ingresos y gastos del negocio.
+        # Prepare prompt for OpenAI
+        prompt = f"""
+        Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado:
+        1. Tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}.
+        2. Factores regionales específicos de {comunidad_autonoma} que puedan afectar los gastos.
+        3. Patrones estacionales que impacten los ingresos y gastos del negocio.
 
-Análisis financiero:
-1. Describir patrones de gasto, impacto en el negocio, y severidad (alto/medio/bajo).
-2. Describir anomalías, causas probables, nivel de riesgo (alto/medio/bajo), y acciones inmediatas recomendadas.
-3. Comparar con promedios de la industria, identificar brechas de rendimiento, y oportunidades de mejora.
+        Análisis financiero:
+        1. Describir patrones de gasto, impacto en el negocio, y severidad (alto/medio/bajo).
+        2. Describir anomalías, causas probables, nivel de riesgo (alto/medio/bajo), y acciones inmediatas recomendadas.
+        3. Comparar con promedios de la industria, identificar brechas de rendimiento, y oportunidades de mejora.
 
-Recomendaciones:
-1. Acción recomendada, impacto esperado, dificultad de implementación (alta/media/baja), plazo estimado (corto/medio/largo), recursos necesarios, y potencial de ROI (alto/medio/bajo).
+        Recomendaciones:
+        1. Acción recomendada, impacto esperado, dificultad de implementación (alta/media/baja), plazo estimado (corto/medio/largo), recursos necesarios, y potencial de ROI (alto/medio/bajo).
 
-Evaluación de riesgos:
-1. Identificar riesgos, estrategias de mitigación, y métricas de monitoreo recomendadas.
+        Evaluación de riesgos:
+        1. Identificar riesgos, estrategias de mitigación, y métricas de monitoreo recomendadas.
 
-Oportunidades de optimización:
-1. Oportunidades para reducir costos, aumentar ingresos, y mejorar procesos.
-"""
+        Oportunidades de optimización:
+        1. Oportunidades para reducir costos, aumentar ingresos, y mejorar procesos.
+        """
 
-response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
-        {"role": "user", "content": prompt}
-    ],
-    temperature=0.5
-)
+        datos = f"""
+        {category_stats.to_string()}
+        {tipo_gasto_stats.to_string()}
+        """
+
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5
+        )
+
         raw_response = response.choices[0].message['content'].strip()
         logger.debug(f"Respuesta de OpenAI: {raw_response}")
 
@@ -181,7 +187,7 @@ response = openai.ChatCompletion.create(
             "anomalies": ["No se pudo analizar", "Sistema en modo fallback"],
             "recommendations": ["Verificar datos", "Reintentar más tarde"]
         }
-
+        
 # Montar archivos estáticos después de las rutas API
 if os.path.exists("../frontend/dist"):
     app.mount("/", StaticFiles(directory="../frontend/dist", html=True), name="static")
