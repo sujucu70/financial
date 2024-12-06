@@ -28,3 +28,7 @@ jobs:
     - name: Run tests
       run: |
         pytest
+
+    - name: Clean up generated files
+      run: |
+        rm -rf assets/index-CMXX0eFc.js
