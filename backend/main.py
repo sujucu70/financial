@@ -140,73 +140,35 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
         tipo_gasto_stats = df.groupby('tipo_gasto')['importe'].sum().round(2)
         
 # Prepare prompt for OpenAI
-        prompt = f"""
-        Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado. Considera tendencias de mercado y factores regionales:
-        {{
-            "industry_context": {{
-                "market_trends": ["Describe las tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}"],
-                "regional_factors": ["Considera factores regionales específicos de {comunidad_autonoma} que puedan afectar los gastos"],
-                "seasonal_patterns": ["Identifica patrones estacionales que impacten los ingresos y gastos del negocio"]
-            }},
-            "financial_analysis": {{
-                "spending_patterns": [
-                    {{
-                        "pattern": "Describir patrón de gasto",
-                        "impact": "Impacto en el negocio",
-                        "severity": "alto/medio/bajo"
-                    }}
-                ],
-                "anomalies": [
-                    {{
-                        "description": "Describir anomalía",
-                        "potential_cause": "Causa probable",
-                        "risk_level": "alto/medio/bajo",
-                        "immediate_actions": ["Acciones inmediatas recomendadas"]
-                    }}
-                ],
-                "benchmarking": {{
-                    "industry_averages": "Comparar con promedios de la industria",
-                    "performance_gaps": ["Identificar brechas de rendimiento"],
-                    "opportunities": ["Oportunidades de mejora"]
-                }}
-            }},
-            "recommendations": [
-                {{
-                    "action": "Describir acción recomendada",
-                    "expected_impact": "Impacto esperado",
-                    "implementation_difficulty": "alta/media/baja",
-                    "estimated_timeframe": "corto/medio/largo plazo",
-                    "required_resources": ["Recursos necesarios"],
-                    "roi_potential": "alto/medio/bajo"
-                }}
-            ],
-            "risk_assessment": {{
-                "identified_risks": ["Identificar riesgos"],
-                "mitigation_strategies": ["Estrategias de mitigación"],
-                "monitoring_metrics": ["Métricas de monitoreo recomendadas"]
-            }},
-            "optimization_opportunities": {{
-                "cost_reduction": ["Oportunidades para reducir costos"],
-                "revenue_enhancement": ["Oportunidades para aumentar ingresos"],
-                "process_improvement": ["Mejoras en procesos"]
-            }}
-        }}
-        """
+prompt = f"""
+Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado:
+1. Tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}.
+2. Factores regionales específicos de {comunidad_autonoma} que puedan afectar los gastos.
+3. Patrones estacionales que impacten los ingresos y gastos del negocio.
 
-        datos = f"""
-        {category_stats.to_string()}
-        {tipo_gasto_stats.to_string()}
-        """
+Análisis financiero:
+1. Describir patrones de gasto, impacto en el negocio, y severidad (alto/medio/bajo).
+2. Describir anomalías, causas probables, nivel de riesgo (alto/medio/bajo), y acciones inmediatas recomendadas.
+3. Comparar con promedios de la industria, identificar brechas de rendimiento, y oportunidades de mejora.
 
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.5
-        )
+Recomendaciones:
+1. Acción recomendada, impacto esperado, dificultad de implementación (alta/media/baja), plazo estimado (corto/medio/largo), recursos necesarios, y potencial de ROI (alto/medio/bajo).
 
+Evaluación de riesgos:
+1. Identificar riesgos, estrategias de mitigación, y métricas de monitoreo recomendadas.
+
+Oportunidades de optimización:
+1. Oportunidades para reducir costos, aumentar ingresos, y mejorar procesos.
+"""
+
+response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "system", "content": "Eres un analista financiero. Responde solo con JSON válido."},
+        {"role": "user", "content": prompt}
+    ],
+    temperature=0.5
+)
         raw_response = response.choices[0].message['content'].strip()
         logger.debug(f"Respuesta de OpenAI: {raw_response}")
 
