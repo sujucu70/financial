@@ -139,24 +139,27 @@ def generate_mock_analysis(df: pd.DataFrame, sector: str, comunidad_autonoma: st
 
         # Prepare prompt for OpenAI
         prompt = f"""
-        Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}' y genera un informe detallado:
-        1. Tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}.
-        2. Factores regionales específicos de {comunidad_autonoma} que puedan afectar los gastos.
-        3. Patrones estacionales que impacten los ingresos y gastos del negocio.
-
-        Análisis financiero:
-        1. Describir patrones de gasto, impacto en el negocio, y severidad (alto/medio/bajo).
-        2. Describir anomalías, causas probables, nivel de riesgo (alto/medio/bajo), y acciones inmediatas recomendadas.
-        3. Comparar con promedios de la industria, identificar brechas de rendimiento, y oportunidades de mejora.
-
-        Recomendaciones:
-        1. Acción recomendada, impacto esperado, dificultad de implementación (alta/media/baja), plazo estimado (corto/medio/largo), recursos necesarios, y potencial de ROI (alto/medio/bajo).
-
-        Evaluación de riesgos:
-        1. Identificar riesgos, estrategias de mitigación, y métricas de monitoreo recomendadas.
-
-        Oportunidades de optimización:
-        1. Oportunidades para reducir costos, aumentar ingresos, y mejorar procesos.
+        Analiza los datos financieros de una PYME del sector '{sector}' en '{comunidad_autonoma}'. teniendo en cuenta patrones estacionales que impacten en los ingresos y gastos del negocio, factores regionales específicos Tendencias de mercado relevantes para el sector {sector} en {comunidad_autonoma}. 
+        Genera un informe detallado:
+        1. Patrones: Describir patrones de gasto, impacto en el negocio, y severidad (alto/medio/bajo).
+        2. Anomalías: Describir anomalías, causas probables, nivel de riesgo (alto/medio/bajo), y acciones inmediatas recomendadas.
+        3. Recomendaciones: Comparar con promedios de la industria, identificar brechas de rendimiento, y oportunidades de mejora. Con estos datos, generar listado de 3 acciones recomendadas, impacto esperado, dificultad de implementación (alta/media/baja), plazo estimado (corto/medio/largo), recursos necesarios, y potencial de ROI (alto/medio/bajo).
+        La respuesta debe seguir el siguiente formato JSON:
+        {{
+            "patterns": [
+                "describe patrón 1",
+                "describe patrón 2",
+                "describe patrón 3"
+            ],
+            "anomalies": [
+                "describe anomalía 1",
+                "describe anomalía 2"
+            ],
+            "recommendations": [
+                "describe recomendación 1",
+                "describe recomendación 2"
+            ]
+        }}
         """
 
         response = openai.ChatCompletion.create(
