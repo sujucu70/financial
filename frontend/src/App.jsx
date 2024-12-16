@@ -4,6 +4,10 @@ import { Upload, AlertTriangle, Brain } from 'lucide-react';
 import axios from 'axios';
 import 'tailwindcss/tailwind.css';
 
+const formatNumber = (number) => {
+  return number.toLocaleString('es-ES', { minimumFractionDigits: 2 });
+};
+
 // Define CustomTooltip outside the main component
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
