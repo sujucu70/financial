@@ -18,13 +18,13 @@ const CustomTooltip = ({ active, payload, label }) => {
             </p>
             <div className="text-sm text-gray-600 mt-1">
               <p>Rango de previsión:</p>
-              <p>Mín: {dataPoint.lowerBound.toFixed(2)}€</p>
-              <p>Máx: {dataPoint.upperBound.toFixed(2)}€</p>
+              <p>Mín: {formatNumber(dataPoint.lowerBound.toFixed(2))}€</p>
+              <p>Máx: {formatNumber(dataPoint.upperBound.toFixed(2))}€</p>
             </div>
           </>
         ) : (
           <p className="text-blue-600">
-            Gastos: {payload[0].value.toFixed(2)}€
+                Gastos: {formatNumber(payload[0].value.toFixed(2))}€
           </p>
         )}
       </div>
@@ -172,30 +172,29 @@ function App() {
         </div>
       )}
 
-      {/* Stats Section */}
-      {data?.stats && (
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-lg font-semibold mb-4">Estadísticas Generales</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+{data?.stats && (
+    <div className="bg-white p-6 rounded-lg shadow mb-6">
+        <h2 className="text-lg font-semibold mb-4">Estadísticas Generales</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-4 bg-blue-50 rounded">
-              <p className="text-sm text-gray-600">Gasto Total</p>
-              <p className="text-lg font-bold">{data.stats.total_gasto.toFixed(2)}€</p>
+                <p className="text-sm text-gray-600">Gasto Total</p>
+                <p className="text-lg font-bold">{formatNumber(data.stats.total_gasto.toFixed(2))}€</p>
             </div>
             <div className="p-4 bg-green-50 rounded">
-              <p className="text-sm text-gray-600">Promedio Mensual</p>
-              <p className="text-lg font-bold">{data.stats.promedio_mensual.toFixed(2)}€</p>
+                <p className="text-sm text-gray-600">Promedio Mensual</p>
+                <p className="text-lg font-bold">{formatNumber(data.stats.promedio_mensual.toFixed(2))}€</p>
             </div>
             <div className="p-4 bg-yellow-50 rounded">
-              <p className="text-sm text-gray-600">Gasto Máximo</p>
-              <p className="text-lg font-bold">{data.stats.maximo_gasto.toFixed(2)}€</p>
+                <p className="text-sm text-gray-600">Gasto Máximo</p>
+                <p className="text-lg font-bold">{formatNumber(data.stats.maximo_gasto.toFixed(2))}€</p>
             </div>
             <div className="p-4 bg-purple-50 rounded">
-              <p className="text-sm text-gray-600">Transacciones</p>
-              <p className="text-lg font-bold">{data.stats.num_transacciones}</p>
+                <p className="text-sm text-gray-600">Transacciones</p>
+                <p className="text-lg font-bold">{formatNumber(data.stats.num_transacciones)}</p>
             </div>
-          </div>
         </div>
-      )}
+    </div>
+)}
 
       {/* Chart Section */}
       {data && (
