@@ -65,7 +65,7 @@ async def analyze_file(file: UploadFile = File(...), sector: str = '', comunidad
         logger.info(f"Iniciando análisis de archivo: {file.filename}")
         contents = await file.read()
         logger.debug("Archivo leído correctamente")
-        df = pd.read_csv(pd.io.common.BytesIO(contents),sep=';')
+        df = pd.read_csv(pd.io.common.BytesIO(contents))
         logger.debug(f"Columnas en el CSV: {df.columns.tolist()}")
         required_columns = ['fecha', 'categoria', 'concepto', 'importe', 'tipo_gasto']
         if not all(col in df.columns for col in required_columns):
